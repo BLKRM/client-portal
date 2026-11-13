@@ -217,6 +217,7 @@ Each phase ships to WordPress.com staging for review before production.
 ## 8. Open items
 
 - [ ] Approve the mockup (layout, branding, light/dark treatment).
+      Mockup v1 (private canvas): https://claude.ai/artifact/E7WuRPK1n29XEkKPgSHvS5
 - [ ] Confirm the Project type list (draft mirrors BLKRM's four service groups).
 - [ ] Confirm budget ranges for the request form.
 - [ ] Phase 0 spike result: is a non-web-served writable path available on WordPress.com?
