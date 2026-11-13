@@ -75,6 +75,10 @@ final class Plugin {
 			( new AdminMenu() )->register();
 		}
 
+		// Site administrators always get full portal access, even on hosts
+		// (e.g. WordPress.com) where stored role capabilities may not apply.
+		add_filter( 'user_has_cap', array( $this, 'grant_admin_caps' ), 10, 1 );
+
 		// Keep clients out of wp-admin and hide the admin bar for them.
 		add_action( 'admin_init', array( $this, 'redirect_clients_from_admin' ) );
 		add_filter( 'show_admin_bar', array( $this, 'filter_admin_bar' ) );
@@ -83,6 +87,21 @@ final class Plugin {
 		if ( ! wp_next_scheduled( self::CRON_CLEANUP ) ) {
 			wp_schedule_event( time() + HOUR_IN_SECONDS, 'hourly', self::CRON_CLEANUP );
 		}
+	}
+
+	/**
+	 * Give anyone who can manage the site every portal capability.
+	 *
+	 * @param array $allcaps The user's capabilities.
+	 * @return array
+	 */
+	public function grant_admin_caps( $allcaps ) {
+		if ( ! empty( $allcaps['manage_options'] ) ) {
+			$allcaps[ Roles::CAP_ACCESS ]   = true;
+			$allcaps[ Roles::CAP_MANAGE ]   = true;
+			$allcaps[ Roles::CAP_SETTINGS ] = true;
+		}
+		return $allcaps;
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * Plugin Name:       BLKRM Client Portal
  * Plugin URI:        https://blkrm.com/
  * Description:       Password-protected client workspace for Black Room Creative: projects, files, approvals and requests, branded BLKRM.
- * Version:           0.1.0
+ * Version:           0.1.1
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Black Room Creative
@@ -21,7 +21,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BLKRM_PORTAL_VERSION', '0.1.0' );
+define( 'BLKRM_PORTAL_VERSION', '0.1.1' );
 define( 'BLKRM_PORTAL_FILE', __FILE__ );
 define( 'BLKRM_PORTAL_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BLKRM_PORTAL_URL', plugin_dir_url( __FILE__ ) );
