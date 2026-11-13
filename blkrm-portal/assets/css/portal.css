@@ -1,0 +1,828 @@
+/**
+ * WP Agency Hub — Portal Styles
+ *
+ * Uses CSS custom properties for white-label theming.
+ * --ah-primary, --ah-secondary set by BrandingManager.
+ *
+ * @package WPAgencyHub
+ */
+
+/* === Reset & Base === */
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+.wpah-portal {
+	margin: 0;
+	padding: 0;
+	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: var(--ah-text-primary, #1a1a1a);
+	background: var(--ah-surface-secondary, #f5f5f7);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* === Layout === */
+.wpah-container {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 0 24px;
+}
+
+.wpah-main {
+	padding: 32px 0 48px;
+	min-height: calc(100vh - 140px);
+}
+
+/* === Header === */
+.wpah-header {
+	background: var(--ah-surface-primary, #fff);
+	border-bottom: 1px solid var(--ah-border, #e5e5e7);
+	position: sticky;
+	top: 0;
+	z-index: 100;
+}
+
+.wpah-header__inner {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 0 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 64px;
+}
+
+.wpah-header__logo {
+	text-decoration: none;
+}
+
+.wpah-header__logo img {
+	max-height: 40px;
+	max-width: 180px;
+	display: block;
+}
+
+.wpah-header__site-name {
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--ah-primary, #007AFF);
+}
+
+.wpah-header__nav {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+}
+
+.wpah-header__user {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.wpah-header__user-name {
+	font-size: 14px;
+	color: var(--ah-text-secondary, #636366);
+}
+
+.wpah-nav-link {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--ah-text-primary, #1a1a1a);
+	text-decoration: none;
+	transition: color 200ms ease;
+}
+
+.wpah-nav-link:hover {
+	color: var(--ah-primary, #007AFF);
+}
+
+.wpah-nav-link--logout {
+	color: var(--ah-text-secondary, #636366);
+}
+
+/* === Footer === */
+.wpah-footer {
+	background: var(--ah-surface-primary, #fff);
+	border-top: 1px solid var(--ah-border, #e5e5e7);
+	padding: 16px 0;
+}
+
+.wpah-footer__text {
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+	text-align: center;
+	margin: 0;
+}
+
+/* === Typography === */
+.wpah-page-title {
+	font-size: 32px;
+	font-weight: 600;
+	line-height: 1.2;
+	letter-spacing: -0.3px;
+	margin: 0 0 24px;
+	color: var(--ah-text-primary, #1a1a1a);
+}
+
+.wpah-section-title {
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: -0.2px;
+	margin: 0 0 16px;
+	color: var(--ah-text-primary, #1a1a1a);
+}
+
+.wpah-section {
+	margin-top: 32px;
+}
+
+.wpah-empty {
+	font-size: 16px;
+	color: var(--ah-text-secondary, #636366);
+	padding: 32px;
+	text-align: center;
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+}
+
+/* === Badges === */
+.wpah-badge {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.25px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	line-height: 1.3;
+}
+
+.wpah-badge--sm {
+	font-size: 11px;
+	padding: 2px 6px;
+}
+
+.wpah-badge--lg {
+	font-size: 14px;
+	padding: 6px 12px;
+}
+
+.status-pending {
+	background: var(--ah-surface-secondary, #f5f5f7);
+	color: var(--ah-text-primary, #1a1a1a);
+}
+
+.status-progress {
+	background: rgba(0, 122, 255, 0.12);
+	color: var(--ah-primary, #007AFF);
+}
+
+.status-approved {
+	background: rgba(52, 199, 89, 0.12);
+	color: var(--ah-success, #34C759);
+}
+
+.status-danger {
+	background: rgba(255, 59, 48, 0.12);
+	color: var(--ah-danger, #FF3B30);
+}
+
+/* === Buttons === */
+.wpah-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 16px;
+	font-size: 16px;
+	font-weight: 600;
+	font-family: inherit;
+	line-height: 1;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+	min-width: 120px;
+	min-height: 44px;
+}
+
+.wpah-btn--primary {
+	background: var(--ah-primary, #007AFF);
+	color: #fff;
+}
+
+.wpah-btn--primary:hover {
+	background: var(--ah-primary-hover, #0051D5);
+	transform: scale(1.02);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wpah-btn--primary:active {
+	background: var(--ah-primary-active, #003A99);
+	transform: scale(1);
+}
+
+.wpah-btn--secondary {
+	background: transparent;
+	border: 1px solid var(--ah-border, #e5e5e7);
+	color: var(--ah-text-primary, #1a1a1a);
+}
+
+.wpah-btn--secondary:hover {
+	background: var(--ah-surface-secondary, #f5f5f7);
+	border-color: var(--ah-text-primary, #1a1a1a);
+}
+
+.wpah-btn--danger {
+	background: var(--ah-danger, #FF3B30);
+	color: #fff;
+}
+
+.wpah-btn--danger:hover {
+	background: var(--ah-danger-hover, #CC2F26);
+	transform: scale(1.02);
+}
+
+.wpah-btn--danger:active {
+	transform: scale(1);
+}
+
+.wpah-btn--sm {
+	padding: 6px 12px;
+	font-size: 14px;
+	min-width: 80px;
+	min-height: 36px;
+}
+
+.wpah-btn--lg {
+	padding: 12px 24px;
+	font-size: 18px;
+	min-height: 48px;
+}
+
+.wpah-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* === Cards === */
+.wpah-card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 16px;
+}
+
+.wpah-card {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 16px;
+	transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
+
+.wpah-card:hover {
+	border-color: var(--ah-text-secondary, #636366);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.wpah-card__header {
+	margin-bottom: 8px;
+}
+
+.wpah-card__title {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0 0 8px;
+	color: var(--ah-text-primary, #1a1a1a);
+}
+
+.wpah-card__desc {
+	font-size: 14px;
+	color: var(--ah-text-secondary, #636366);
+	margin: 0 0 12px;
+	line-height: 1.4;
+}
+
+.wpah-card__meta {
+	font-size: 14px;
+	color: var(--ah-text-secondary, #636366);
+	margin: 0 0 8px;
+}
+
+.wpah-card__footer {
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+	margin: 12px 0 0;
+}
+
+/* === Alerts === */
+.wpah-alerts {
+	margin-bottom: 24px;
+}
+
+.wpah-alert {
+	padding: 12px 16px;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	margin-bottom: 8px;
+}
+
+.wpah-alert--info {
+	background: rgba(0, 122, 255, 0.08);
+	color: var(--ah-primary, #007AFF);
+	border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+/* === Activity Feed === */
+.wpah-activity-feed {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.wpah-activity-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 8px 0;
+}
+
+.wpah-activity-item + .wpah-activity-item {
+	border-top: 1px solid var(--ah-border, #e5e5e7);
+}
+
+.wpah-activity-item__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--ah-primary, #007AFF);
+	margin-top: 6px;
+	flex-shrink: 0;
+}
+
+.wpah-activity-item__content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	font-size: 14px;
+}
+
+.wpah-activity-item__user {
+	font-weight: 600;
+}
+
+.wpah-activity-item__action {
+	color: var(--ah-text-secondary, #636366);
+}
+
+.wpah-activity-item__project {
+	font-weight: 500;
+}
+
+.wpah-activity-item__time {
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+	width: 100%;
+}
+
+/* === Back Link === */
+.wpah-back-link {
+	font-size: 14px;
+	color: var(--ah-primary, #007AFF);
+	text-decoration: none;
+	display: inline-block;
+	margin-bottom: 8px;
+}
+
+.wpah-back-link:hover {
+	text-decoration: underline;
+}
+
+/* === Project Detail === */
+.wpah-project__header {
+	margin-bottom: 24px;
+}
+
+.wpah-project__description {
+	font-size: 16px;
+	line-height: 1.5;
+	margin-bottom: 24px;
+	padding: 16px;
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+}
+
+.wpah-project__meta {
+	display: flex;
+	gap: 24px;
+	margin-bottom: 24px;
+}
+
+.wpah-meta-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wpah-meta-item__label {
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.25px;
+	color: var(--ah-text-secondary, #636366);
+}
+
+.wpah-meta-item__value {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.wpah-project__actions {
+	display: flex;
+	gap: 12px;
+	margin-top: 32px;
+}
+
+/* === Milestones === */
+.wpah-milestones {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 16px;
+}
+
+.wpah-milestone {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 0;
+}
+
+.wpah-milestone + .wpah-milestone {
+	border-top: 1px solid var(--ah-border, #e5e5e7);
+}
+
+.wpah-milestone__indicator {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	border: 2px solid var(--ah-border, #e5e5e7);
+	flex-shrink: 0;
+}
+
+.wpah-milestone--complete .wpah-milestone__indicator {
+	background: var(--ah-success, #34C759);
+	border-color: var(--ah-success, #34C759);
+}
+
+.wpah-milestone__content {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	flex: 1;
+}
+
+.wpah-milestone__name {
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.wpah-milestone__date {
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+	margin-left: auto;
+}
+
+/* === Files === */
+.wpah-file-upload {
+	margin-bottom: 24px;
+}
+
+.wpah-file-upload__dropzone {
+	border: 2px dashed var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 32px;
+	text-align: center;
+	cursor: pointer;
+	transition: all 200ms ease;
+	background: var(--ah-surface-primary, #fff);
+}
+
+.wpah-file-upload__dropzone:hover,
+.wpah-file-upload__dropzone.dragging {
+	border-color: var(--ah-primary, #007AFF);
+	background: rgba(0, 122, 255, 0.04);
+}
+
+.wpah-file-upload__text {
+	font-size: 16px;
+	font-weight: 500;
+	margin: 0 0 4px;
+}
+
+.wpah-file-upload__hint {
+	font-size: 14px;
+	color: var(--ah-text-secondary, #636366);
+	margin: 0;
+}
+
+.wpah-file-upload__input {
+	display: none;
+}
+
+.wpah-progress-bar {
+	height: 4px;
+	background: var(--ah-surface-secondary, #f5f5f7);
+	border-radius: 2px;
+	overflow: hidden;
+	margin-top: 12px;
+}
+
+.wpah-progress-bar__fill {
+	height: 100%;
+	background: var(--ah-primary, #007AFF);
+	border-radius: 2px;
+	width: 0;
+	transition: width 300ms ease;
+}
+
+.wpah-file-upload__status {
+	font-size: 14px;
+	color: var(--ah-text-secondary, #636366);
+	margin: 8px 0 0;
+}
+
+.wpah-file-list {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.wpah-file-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+}
+
+.wpah-file-item + .wpah-file-item {
+	border-top: 1px solid var(--ah-border, #e5e5e7);
+}
+
+.wpah-file-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 6px;
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+
+.wpah-file-icon--img {
+	background: rgba(52, 199, 89, 0.12);
+	color: var(--ah-success, #34C759);
+}
+
+.wpah-file-icon--pdf {
+	background: rgba(255, 59, 48, 0.12);
+	color: var(--ah-danger, #FF3B30);
+}
+
+.wpah-file-icon--vid {
+	background: rgba(0, 122, 255, 0.12);
+	color: var(--ah-primary, #007AFF);
+}
+
+.wpah-file-icon--doc {
+	background: var(--ah-surface-secondary, #f5f5f7);
+	color: var(--ah-text-secondary, #636366);
+}
+
+.wpah-file-item__info {
+	flex: 1;
+	min-width: 0;
+}
+
+.wpah-file-item__name {
+	display: block;
+	font-size: 14px;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.wpah-file-item__meta {
+	display: block;
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+	margin-top: 2px;
+}
+
+.wpah-file-item__actions {
+	flex-shrink: 0;
+}
+
+/* === Messages === */
+.wpah-message-thread {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 16px;
+	max-height: 500px;
+	overflow-y: auto;
+}
+
+.wpah-message {
+	padding: 12px;
+	margin-bottom: 12px;
+	border-radius: 8px;
+	max-width: 80%;
+}
+
+.wpah-message:last-child {
+	margin-bottom: 0;
+}
+
+.wpah-message--own {
+	background: rgba(0, 122, 255, 0.08);
+	margin-left: auto;
+}
+
+.wpah-message--other {
+	background: var(--ah-surface-secondary, #f5f5f7);
+}
+
+.wpah-message__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+
+.wpah-message__sender {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.wpah-message__time {
+	font-size: 12px;
+	color: var(--ah-text-secondary, #636366);
+}
+
+.wpah-message__body {
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.wpah-message__body p {
+	margin: 0;
+}
+
+.wpah-message-form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.wpah-message-form__input {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 6px;
+	font-size: 16px;
+	font-family: inherit;
+	resize: vertical;
+	transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.wpah-message-form__input:focus {
+	outline: none;
+	border-color: var(--ah-primary, #007AFF);
+	box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* === Approval === */
+.wpah-approval__header {
+	margin-bottom: 24px;
+}
+
+.wpah-approval__file {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 24px;
+}
+
+.wpah-approval__image {
+	max-width: 100%;
+	border-radius: 4px;
+	margin-bottom: 12px;
+}
+
+.wpah-approval__file-info {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.wpah-approval__note {
+	background: var(--ah-surface-secondary, #f5f5f7);
+	padding: 16px;
+	border-radius: 8px;
+	margin-bottom: 24px;
+}
+
+.wpah-approval__note h3 {
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0 0 8px;
+}
+
+.wpah-approval__actions {
+	background: var(--ah-surface-primary, #fff);
+	border: 1px solid var(--ah-border, #e5e5e7);
+	border-radius: 8px;
+	padding: 24px;
+	margin-bottom: 24px;
+}
+
+.wpah-approval__actions h3 {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0 0 16px;
+}
+
+.wpah-approval__buttons {
+	display: flex;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+	.wpah-container {
+		padding: 0 16px;
+	}
+
+	.wpah-header__inner {
+		padding: 0 16px;
+	}
+
+	.wpah-page-title {
+		font-size: 24px;
+	}
+
+	.wpah-card-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.wpah-project__meta {
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.wpah-project__actions {
+		flex-direction: column;
+	}
+
+	.wpah-btn {
+		width: 100%;
+	}
+
+	.wpah-message {
+		max-width: 95%;
+	}
+
+	.wpah-approval__buttons {
+		flex-direction: column;
+	}
+
+	.wpah-file-item {
+		flex-wrap: wrap;
+	}
+
+	.wpah-header__user-name {
+		display: none;
+	}
+}

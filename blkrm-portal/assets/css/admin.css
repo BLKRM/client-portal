@@ -1,0 +1,52 @@
+/**
+ * WP Agency Hub — Admin Styles
+ *
+ * @package WPAgencyHub
+ */
+
+.wpah-admin-stats {
+	display: flex;
+	gap: 16px;
+	margin: 20px 0;
+	flex-wrap: wrap;
+}
+
+.wpah-admin-stat {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 20px 24px;
+	min-width: 160px;
+	text-align: center;
+}
+
+.wpah-admin-stat__number {
+	display: block;
+	font-size: 36px;
+	font-weight: 600;
+	color: #0073aa;
+	line-height: 1;
+}
+
+.wpah-admin-stat__label {
+	display: block;
+	font-size: 13px;
+	color: #666;
+	margin-top: 6px;
+}
+
+.wpah-admin-quick-actions {
+	margin: 20px 0;
+	display: flex;
+	gap: 8px;
+}
+
+.wpah-admin-quick-actions .button {
+	display: inline-flex;
+	align-items: center;
+}
+
+/* Color picker fields */
+.wpah-color-picker {
+	max-width: 100px;
+}
