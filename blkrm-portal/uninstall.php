@@ -1,54 +1,40 @@
 <?php
 /**
- * WP Agency Hub uninstaller.
+ * Uninstall. Removes roles and settings. Client data (tables + stored files)
+ * is kept unless "BLKRM_PORTAL_DELETE_DATA" is defined true in wp-config.php,
+ * so deleting the plugin by accident never destroys client files.
  *
- * Fired when the plugin is deleted via the WordPress admin.
- *
- * @package WPAgencyHub
+ * @package BLKRM\Portal
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-global $wpdb;
+require_once __DIR__ . '/src/Auth/Roles.php';
+require_once __DIR__ . '/src/Install/Schema.php';
 
-// Drop all plugin tables (order matters for foreign key safety).
-$tables = array(
-	'ah_activity_log',
-	'ah_messages',
-	'ah_approvals',
-	'ah_files',
-	'ah_milestones',
-	'ah_branding',
-	'ah_projects',
-	'ah_clients',
-);
+\BLKRM\Portal\Auth\Roles::uninstall();
 
-foreach ( $tables as $table ) {
-	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}{$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+wp_clear_scheduled_hook( 'blkrm_portal_cleanup_uploads' );
+
+foreach ( array( 'blkrm_portal_slug', 'blkrm_portal_rewrites' ) as $option ) {
+	delete_option( $option );
 }
 
-// Delete all plugin options.
-$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpah\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-
-// Remove the ah_client role.
-remove_role( 'ah_client' );
-
-// Optionally remove the upload directory.
-$upload_dir = wp_upload_dir();
-$ah_dir     = $upload_dir['basedir'] . '/ah-files';
-
-if ( is_dir( $ah_dir ) ) {
-	// Recursively delete the directory and its contents.
-	$iterator = new RecursiveDirectoryIterator( $ah_dir, RecursiveDirectoryIterator::SKIP_DOTS );
-	$files    = new RecursiveIteratorIterator( $iterator, RecursiveIteratorIterator::CHILD_FIRST );
-
-	foreach ( $files as $file ) {
-		if ( $file->isDir() ) {
-			rmdir( $file->getRealPath() ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		} else {
-			unlink( $file->getRealPath() ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
+if ( defined( 'BLKRM_PORTAL_DELETE_DATA' ) && true === BLKRM_PORTAL_DELETE_DATA ) {
+	global $wpdb;
+	foreach ( \BLKRM\Portal\Install\Schema::tables() as $table ) {
+		$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
 	}
-
-	rmdir( $ah_dir ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	$dir = (string) get_option( 'blkrm_portal_storage_dir', '' );
+	if ( '' !== $dir && is_dir( $dir ) && false !== strpos( basename( $dir ), 'blkrm' ) ) {
+		$it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir, FilesystemIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+		foreach ( $it as $f ) {
+			$f->isDir() ? rmdir( $f->getPathname() ) : unlink( $f->getPathname() ); // phpcs:ignore
+		}
+		rmdir( $dir ); // phpcs:ignore
+	}
+	foreach ( array( 'blkrm_portal_db_version', 'blkrm_portal_storage_dir', 'blkrm_portal_master_key' ) as $option ) {
+		delete_option( $option );
+	}
+	delete_metadata( 'user', 0, 'blkrm_portal_theme', '', true );
 }

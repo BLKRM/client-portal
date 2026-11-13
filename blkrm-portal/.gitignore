@@ -1,6 +1,7 @@
 /vendor/
 /node_modules/
+/build/
+composer.lock
+.phpunit.result.cache
 *.log
 .DS_Store
-composer.lock
-.phpcs-cache

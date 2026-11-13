@@ -1,62 +1,24 @@
-/**
- * WP Agency Hub — Admin JavaScript
- *
- * Handles color picker, media upload, and milestone management.
- *
- * @package WPAgencyHub
- */
-
+/* BLKRM Portal admin: logo picker for client organizations. */
 (function ($) {
 	'use strict';
-
-	$(document).ready(function () {
-		// Initialize color pickers.
-		$('.wpah-color-picker').wpColorPicker();
-
-		// Logo upload via WordPress media library.
-		$('#wpah-upload-logo').on('click', function (e) {
+	$(function () {
+		$(document).on('click', '[data-blkrm-pick-logo]', function (e) {
 			e.preventDefault();
-
-			var frame = wp.media({
-				title: 'Choose Logo',
-				button: { text: 'Use This Logo' },
-				multiple: false,
-				library: { type: 'image' },
-			});
-
+			var $form = $(this).closest('form');
+			var frame = wp.media({ title: 'Client logo', library: { type: 'image' }, multiple: false });
 			frame.on('select', function () {
-				var attachment = frame.state().get('selection').first().toJSON();
-				$('#logo_url').val(attachment.url);
+				var a = frame.state().get('selection').first().toJSON();
+				var url = (a.sizes && a.sizes.medium ? a.sizes.medium.url : a.url);
+				$form.find('[data-blkrm-logo-id]').val(a.id);
+				$form.find('[data-blkrm-logo-preview]').empty().append($('<img>', { src: url, alt: '', css: { maxWidth: 120, maxHeight: 64 } }));
 			});
-
 			frame.open();
 		});
-
-		// Milestone management.
-		var milestonesTable = $('#wpah-milestones-table tbody');
-
-		$('#wpah-add-milestone').on('click', function () {
-			var row = $('<tr>' +
-				'<td>' +
-				'<input type="hidden" name="milestone_id[]" value="0">' +
-				'<input type="text" name="milestone_name[]" value="" class="regular-text" placeholder="Milestone name">' +
-				'</td>' +
-				'<td>' +
-				'<select name="milestone_status[]">' +
-				'<option value="pending">Pending</option>' +
-				'<option value="in_progress">In Progress</option>' +
-				'<option value="complete">Complete</option>' +
-				'</select>' +
-				'</td>' +
-				'<td><input type="date" name="milestone_due[]" value=""></td>' +
-				'<td><button type="button" class="button wpah-remove-milestone">Remove</button></td>' +
-				'</tr>');
-
-			milestonesTable.append(row);
-		});
-
-		milestonesTable.on('click', '.wpah-remove-milestone', function () {
-			$(this).closest('tr').remove();
+		$(document).on('click', '[data-blkrm-clear-logo]', function (e) {
+			e.preventDefault();
+			var $form = $(this).closest('form');
+			$form.find('[data-blkrm-logo-id]').val('0');
+			$form.find('[data-blkrm-logo-preview]').empty();
 		});
 	});
 })(jQuery);

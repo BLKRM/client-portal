@@ -4,7 +4,7 @@ A password-protected client hub for **Black Room Creative (BLKRM)**: project man
 asset management, feedback + revisions, and secure file exchange. It runs as a WordPress plugin
 on blkrm.com, and the whole experience is BLKRM-branded: clients work *inside BLKRM's tool*.
 
-_Last updated: 2026-11-13_
+_Last updated: 2026-11-13 · Status: mockup approved, Phase 0 built (awaiting WordPress.com staging check)_
 
 ---
 
@@ -27,7 +27,7 @@ and rework it. Do not build directly on top of it as-is.
 - The GPL allows forking and modifying. We keep the license notice and credit.
 - The weak parts get rebuilt regardless: data model, file storage and portal UI.
 
-**Problems in the base plugin, all fixed in Phase 0**
+**Problems in the base plugin** (all fixed in Phase 0 except #6, which comes back in Phase 4, and #7's 2FA, which is Phase 5; the login lockout is already done)
 
 | # | Problem | Fix |
 |---|---|---|
@@ -71,7 +71,7 @@ and rework it. Do not build directly on top of it as-is.
   digital/web tokens. The UI should be clean, contemporary and square-cornered with the yellow accent used sparingly.
 - **Light and dark mode.** A toggle sits in the top-right corner. Initial value follows the OS
   preference; the choice is remembered per user.
-- **Client brand on login only.** Each client org gets its own login URL (`/portal/{client-slug}`)
+- **Client brand on login only.** Each client org gets its own login URL (`/portal/login/{client-slug}`)
   showing the client's logo beside BLKRM's ("Acme Co. × BLKRM"). If a client has no brand assets, the BLKRM
   login shows. The generic login is at `/portal`.
 - **Workspace feel.** After login, the header shows a "{Client} workspace" label inside the BLKRM
@@ -202,8 +202,8 @@ REST route and portal page.
 
 | Phase | Scope | Outcome |
 |---|---|---|
-| **Mockup** | Clickable mockup of Login, Home (calendar + date box), Projects (Board/Grid), Project detail (Timeline), To-dos, Requests form, Files; light/dark | User edits and approves the look and flow before feature code |
-| **0. Foundation** | Fork; fix downloads; storage adapter + encryption + chunked uploads; staff role; orgs + multi-user; schema migrations; app shell + BLKRM theme + light/dark; WP.com staging spike | Secure base on WordPress.com |
+| **Mockup** ✅ approved | Clickable mockup of Login, Home (calendar + date box), Projects (Board/Grid), Project detail (Timeline), To-dos, Requests form, Files; light/dark | User edits and approves the look and flow before feature code |
+| **0. Foundation** ✅ built | Fork; fix downloads; storage adapter + encryption + chunked uploads; staff role; orgs + multi-user; schema migrations; app shell + BLKRM theme + light/dark; WP.com staging spike | Secure base on WordPress.com |
 | **1. Projects** | Board/Grid toggle, 6-stage pipeline, project detail, milestones, Timeline | Day-to-day project tracking |
 | **2. Home + To-dos** | Dashboard, calendar + date box, to-dos with visibility toggle, activity feed | At-a-glance view for both sides |
 | **3. Requests** | 3-step intake form, request queue, accept → project | Clients start projects themselves |
@@ -214,11 +214,32 @@ Each phase ships to WordPress.com staging for review before production.
 
 ---
 
-## 8. Open items
+## 8. Phase 0 — what was built
 
-- [ ] Approve the mockup (layout, branding, light/dark treatment).
+Plugin: [`blkrm-portal/`](../blkrm-portal/) (see its README for install + settings).
+
+- **Fork:** wp-agency-hub is imported unchanged in its own commit, then reworked. Upstream approvals/messages were
+  removed for now; they return, rebuilt, in Phase 4 (feedback + approvals) on the new org/permission model.
+- **Storage:** encrypted at rest (XChaCha20-Poly1305, per-file keys, 8 MB chunks sealed independently so uploads
+  resume in any order and downloads support byte ranges). Files get random names in a private folder, outside the
+  web root when the host allows it.
+- **Uploads:** chunked + resumable with per-chunk SHA-256 and retries; type allow-list + content sniffing.
+- **Downloads:** 15-minute signed links bound to the signed-in user; Range support; attachment + nosniff.
+- **People:** client organizations with seat limits, the `blkrm_staff` role, invites, one-click access removal
+  (ends that person's sessions).
+- **Shell:** standalone BLKRM app at `/portal/` (no theme/Elementor), light/dark, approved login design.
+- **Hardening done early:** login lockout (5 tries / 15 min), nonce-protected logout, clients kept out of wp-admin,
+  member adds can't demote editors/admins, audit log.
+- **Tests:** 21 unit tests (crypto, storage, ranges, tokens, file types) + a 34-check end-to-end suite run against
+  WordPress 7.1.4 with a real 20 MB upload/download. All passing.
+
+## 9. Open items
+
+- [x] Approve the mockup (layout, branding, light/dark treatment).
       Mockup v1 (private canvas): https://claude.ai/artifact/E7WuRPK1n29XEkKPgSHvS5
 - [ ] Confirm the Project type list (draft mirrors BLKRM's four service groups).
 - [ ] Confirm budget ranges for the request form.
-- [ ] Phase 0 spike result: is a non-web-served writable path available on WordPress.com?
-- [ ] Decide the client login URL base (`/portal/{client}` proposed).
+- [ ] Phase 0 spike result: is a non-web-served writable path available on WordPress.com? → install on staging, run *Settings + Storage → Run web-access test*.
+- [x] Client login URL: `/portal/login/{client-slug}` (keeps `/portal/projects` etc. free for app routes).
+- [ ] Add the portal domain to the Adobe Fonts kit (`agr6dga`) so Proxima Nova loads.
+- [ ] Put `BLKRM_PORTAL_ENCRYPTION_KEY` in wp-config.php on production before the first upload.
