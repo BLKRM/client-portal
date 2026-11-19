@@ -4,7 +4,7 @@ Tags: client portal, project management, file sharing, approvals
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ Forked from WP Agency Hub by Seth Shoultes (GPL-2.0-or-later).
 4. Add clients, people and projects.
 
 == Changelog ==
+
+= 0.1.2 =
+* Storage check now detects folders inside wp-content as public (correct on WordPress.com, where WordPress core lives outside the site folder).
+* Empty storage folders inside the public site are moved outside it automatically when the host allows.
 
 = 0.1.1 =
 * Site administrators always get portal access (fixes missing admin menu on some hosts).

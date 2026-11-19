@@ -99,12 +99,11 @@ final class Diagnostics {
 	 */
 	private static function http_probe( $base ) {
 		$label = __( 'Direct web access blocked', 'blkrm-portal' );
-		$root  = untrailingslashit( wp_normalize_path( (string) realpath( ABSPATH ) ) );
 		$dir   = wp_normalize_path( (string) realpath( $base ) );
 		$name  = 'probe-' . bin2hex( random_bytes( 8 ) ) . '.txt';
 		$token = bin2hex( random_bytes( 16 ) );
 		file_put_contents( $dir . '/' . $name, $token ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		$url = site_url( substr( $dir, strlen( $root ) ) . '/' . $name );
+		$url = LocalPrivateAdapter::public_url_for( $base ) . '/' . $name;
 
 		$res  = wp_remote_get( $url, array( 'timeout' => 10, 'redirection' => 0, 'sslverify' => false ) );
 		$body = is_wp_error( $res ) ? '' : (string) wp_remote_retrieve_body( $res );

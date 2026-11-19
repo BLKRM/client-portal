@@ -28,6 +28,7 @@ final class Migrator {
 	public static function migrations() {
 		return array(
 			1 => array( __CLASS__, 'migrate_1' ),
+			2 => array( __CLASS__, 'migrate_2' ),
 		);
 	}
 
@@ -66,5 +67,13 @@ final class Migrator {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( Schema::v1() );
 		Roles::install();
+	}
+
+	/**
+	 * 0.1.2: move still-empty storage out of the web root where the host
+	 * allows (first installs on WordPress.com landed inside wp-content).
+	 */
+	public static function migrate_2() {
+		\BLKRM\Portal\Storage\LocalPrivateAdapter::relocate_if_empty();
 	}
 }

@@ -76,10 +76,8 @@ class LocalPrivateAdapter implements StorageAdapter {
 			return $existing;
 		}
 
-		$candidates = array(
-			dirname( untrailingslashit( ABSPATH ) ) . '/blkrm-portal-private',
-			untrailingslashit( WP_CONTENT_DIR ) . '/blkrm-private-' . bin2hex( random_bytes( 12 ) ),
-		);
+		$candidates   = self::outside_candidates();
+		$candidates[] = untrailingslashit( WP_CONTENT_DIR ) . '/blkrm-private-' . bin2hex( random_bytes( 12 ) );
 		foreach ( $candidates as $dir ) {
 			if ( self::prepare( $dir ) ) {
 				update_option( self::OPTION, $dir, false );
@@ -87,6 +85,62 @@ class LocalPrivateAdapter implements StorageAdapter {
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * Storage locations one level above the site's public folders, in order.
+	 * Paths that would still be web-served are skipped.
+	 *
+	 * @return string[]
+	 */
+	public static function outside_candidates() {
+		$parents  = array();
+		$doc_root = isset( $_SERVER['DOCUMENT_ROOT'] ) ? (string) $_SERVER['DOCUMENT_ROOT'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( '' !== $doc_root && realpath( $doc_root ) ) {
+			$parents[] = dirname( realpath( $doc_root ) );
+		}
+		if ( defined( 'WP_CONTENT_DIR' ) && realpath( WP_CONTENT_DIR ) ) {
+			$parents[] = dirname( dirname( realpath( WP_CONTENT_DIR ) ) );
+		}
+		if ( realpath( ABSPATH ) ) {
+			$parents[] = dirname( realpath( ABSPATH ) );
+		}
+		$out = array();
+		foreach ( array_unique( $parents ) as $parent ) {
+			if ( '' === $parent || '/' === $parent || null !== self::public_url_for( $parent ) ) {
+				continue;
+			}
+			$out[] = untrailingslashit( $parent ) . '/blkrm-portal-private';
+		}
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
+	 * If storage is inside a public folder and still holds no files, move it
+	 * to a location outside the web root when one is writable. Never moves
+	 * a folder that already contains stored files.
+	 *
+	 * @return string|null New directory, or null if nothing changed.
+	 */
+	public static function relocate_if_empty() {
+		if ( defined( 'BLKRM_PORTAL_STORAGE_DIR' ) ) {
+			return null;
+		}
+		$current = (string) get_option( self::OPTION, '' );
+		if ( '' === $current || ! ( new self( $current ) )->is_inside_webroot() ) {
+			return null;
+		}
+		$objects = glob( $current . '/objects/*/*/*.blk' );
+		if ( ! empty( $objects ) ) {
+			return null;
+		}
+		foreach ( self::outside_candidates() as $dir ) {
+			if ( self::prepare( $dir ) ) {
+				update_option( self::OPTION, $dir, false );
+				return $dir;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -123,9 +177,54 @@ class LocalPrivateAdapter implements StorageAdapter {
 	 * @return bool
 	 */
 	public function is_inside_webroot() {
-		$base = realpath( $this->base );
-		$root = realpath( ABSPATH );
-		return $base && $root && 0 === strpos( trailingslashit( $base ), trailingslashit( $root ) );
+		return null !== $this->public_url_for( $this->base );
+	}
+
+	/**
+	 * Folders the web server publishes, mapped to their public URL. On hosts
+	 * like WordPress.com, WordPress core (ABSPATH) lives outside the site's
+	 * document root, so wp-content and DOCUMENT_ROOT are checked as well.
+	 *
+	 * @return array<string, string> Real path => base URL (most specific first).
+	 */
+	public static function public_roots() {
+		$roots = array();
+		$add   = static function ( $path, $url ) use ( &$roots ) {
+			$real = $path ? realpath( $path ) : false;
+			if ( $real && ! isset( $roots[ $real ] ) ) {
+				$roots[ untrailingslashit( wp_normalize_path( $real ) ) ] = untrailingslashit( $url );
+			}
+		};
+		if ( defined( 'WP_CONTENT_DIR' ) ) {
+			$add( WP_CONTENT_DIR, content_url() );
+		}
+		$doc_root = isset( $_SERVER['DOCUMENT_ROOT'] ) ? (string) $_SERVER['DOCUMENT_ROOT'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( '' !== $doc_root ) {
+			$add( $doc_root, home_url() );
+		}
+		$add( ABSPATH, site_url() );
+		uksort( $roots, static function ( $a, $b ) { return strlen( $b ) - strlen( $a ); } );
+		return $roots;
+	}
+
+	/**
+	 * Public URL a path would be served at, or null if it isn't web-served.
+	 *
+	 * @param string $path Filesystem path.
+	 * @return string|null
+	 */
+	public static function public_url_for( $path ) {
+		$real = realpath( $path );
+		if ( ! $real ) {
+			return null;
+		}
+		$real = untrailingslashit( wp_normalize_path( $real ) );
+		foreach ( self::public_roots() as $root => $url ) {
+			if ( $real === $root || 0 === strpos( $real . '/', $root . '/' ) ) {
+				return $url . substr( $real, strlen( $root ) );
+			}
+		}
+		return null;
 	}
 
 	/**
