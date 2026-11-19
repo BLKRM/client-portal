@@ -14,7 +14,6 @@ use BLKRM\Portal\Portal\Router;
 defined( 'ABSPATH' ) || exit;
 
 $stages = Projects::stages();
-$types  = Projects::types();
 $keys   = array_keys( $stages );
 ?>
 <div class="page-head">
@@ -53,7 +52,7 @@ $keys   = array_keys( $stages );
 						</span>
 						<span class="small strong"><?php echo esc_html( $stages[ $p->stage ] ?? $p->stage ); ?></span>
 					</td>
-					<td class="muted"><?php echo esc_html( $types[ $p->type ] ?? '' ); ?></td>
+					<td class="muted"><?php echo esc_html( Projects::type_labels( $p->type ) ); ?></td>
 					<td class="strong"><?php echo esc_html( Pages::date( $p->due_date ) ); ?></td>
 				</tr>
 			<?php endforeach; ?>

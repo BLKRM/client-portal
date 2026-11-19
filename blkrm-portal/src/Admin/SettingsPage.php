@@ -54,6 +54,18 @@ final class SettingsPage {
 							<p class="description"><?php esc_html_e( 'Must not match an existing page slug.', 'blkrm-portal' ); ?> <a href="<?php echo esc_url( Router::url() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Open portal', 'blkrm-portal' ); ?></a></p>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row"><label for="blkrm-link-hours"><?php esc_html_e( 'Download links last', 'blkrm-portal' ); ?></label></th>
+						<td>
+							<?php $hours = (int) get_option( \BLKRM\Portal\Files\SignedUrl::OPTION_HOURS, 24 ); ?>
+							<select id="blkrm-link-hours" name="link_hours">
+								<?php foreach ( \BLKRM\Portal\Files\SignedUrl::ALLOWED_HOURS as $h ) : ?>
+									<option value="<?php echo (int) $h; ?>" <?php selected( $hours, $h ); ?>><?php echo esc_html( 1 === $h ? __( '1 hour', 'blkrm-portal' ) : sprintf( /* translators: %d: hours */ __( '%d hours', 'blkrm-portal' ), $h ) ); ?></option>
+								<?php endforeach; ?>
+							</select>
+							<p class="description"><?php esc_html_e( 'How long a Download link keeps working. Links only work for the signed-in person who requested them.', 'blkrm-portal' ); ?></p>
+						</td>
+					</tr>
 				</table>
 				<?php submit_button( __( 'Save settings', 'blkrm-portal' ) ); ?>
 			</form>
@@ -107,6 +119,10 @@ final class SettingsPage {
 			AdminMenu::back( self::PAGE, array(), __( 'That address is empty or already used by a page.', 'blkrm-portal' ), 'error' );
 		}
 		update_option( Router::OPTION_SLUG, $slug );
+		$hours = isset( $_POST['link_hours'] ) ? absint( $_POST['link_hours'] ) : 24;
+		if ( in_array( $hours, \BLKRM\Portal\Files\SignedUrl::ALLOWED_HOURS, true ) ) {
+			update_option( \BLKRM\Portal\Files\SignedUrl::OPTION_HOURS, $hours );
+		}
 		AdminMenu::back( self::PAGE, array(), __( 'Settings saved.', 'blkrm-portal' ) );
 	}
 }

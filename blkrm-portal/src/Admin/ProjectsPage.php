@@ -119,12 +119,13 @@ final class ProjectsPage {
 						<?php endforeach; ?>
 					</select>
 				</td></tr>
-				<tr><th scope="row"><label for="blkrm-p-type"><?php esc_html_e( 'Type', 'blkrm-portal' ); ?></label></th><td>
-					<select id="blkrm-p-type" name="type">
+				<tr><th scope="row"><?php esc_html_e( 'Type', 'blkrm-portal' ); ?></th><td>
+					<?php $chosen = Projects::parse_types( $v( 'type', 'print' ) ); ?>
+					<fieldset>
 						<?php foreach ( Projects::types() as $k => $label ) : ?>
-							<option value="<?php echo esc_attr( $k ); ?>" <?php selected( $v( 'type', 'print' ), $k ); ?>><?php echo esc_html( $label ); ?></option>
+							<label style="display:block;margin-bottom:4px"><input type="checkbox" name="types[]" value="<?php echo esc_attr( $k ); ?>" <?php checked( in_array( $k, $chosen, true ) ); ?>> <?php echo esc_html( $label ); ?></label>
 						<?php endforeach; ?>
-					</select>
+					</fieldset>
 				</td></tr>
 				<tr><th scope="row"><label for="blkrm-p-start"><?php esc_html_e( 'Start date', 'blkrm-portal' ); ?></label></th><td><input id="blkrm-p-start" name="start_date" type="date" value="<?php echo esc_attr( $v( 'start_date' ) ); ?>"></td></tr>
 				<tr><th scope="row"><label for="blkrm-p-due"><?php esc_html_e( 'Due date', 'blkrm-portal' ); ?></label></th><td><input id="blkrm-p-due" name="due_date" type="date" value="<?php echo esc_attr( $v( 'due_date' ) ); ?>"></td></tr>
@@ -148,7 +149,7 @@ final class ProjectsPage {
 			'name'        => isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '',
 			'org_id'      => isset( $_POST['org_id'] ) ? absint( $_POST['org_id'] ) : 0,
 			'stage'       => isset( $_POST['stage'] ) ? sanitize_key( wp_unslash( $_POST['stage'] ) ) : 'discovery',
-			'type'        => isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : 'unsure',
+			'types'       => isset( $_POST['types'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['types'] ) ) : array(),
 			'start_date'  => isset( $_POST['start_date'] ) ? sanitize_text_field( wp_unslash( $_POST['start_date'] ) ) : '',
 			'due_date'    => isset( $_POST['due_date'] ) ? sanitize_text_field( wp_unslash( $_POST['due_date'] ) ) : '',
 			'description' => isset( $_POST['description'] ) ? wp_kses_post( wp_unslash( $_POST['description'] ) ) : '',

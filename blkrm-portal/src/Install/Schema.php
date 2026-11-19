@@ -83,7 +83,7 @@ CREATE TABLE {$projects} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   org_id bigint(20) unsigned NOT NULL,
   name varchar(255) NOT NULL DEFAULT '',
-  type varchar(40) NOT NULL DEFAULT '',
+  type varchar(255) NOT NULL DEFAULT '',
   stage varchar(30) NOT NULL DEFAULT 'discovery',
   description longtext NOT NULL,
   start_date date DEFAULT NULL,

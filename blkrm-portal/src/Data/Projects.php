@@ -39,12 +39,56 @@ final class Projects {
 	 */
 	public static function types() {
 		return array(
-			'branding' => __( 'Branding + Strategy', 'blkrm-portal' ),
-			'print'    => __( 'Graphic + Print', 'blkrm-portal' ),
-			'digital'  => __( 'Digital', 'blkrm-portal' ),
-			'consult'  => __( 'Creative Development + Consulting', 'blkrm-portal' ),
-			'unsure'   => __( 'Not sure yet', 'blkrm-portal' ),
+			'branding'     => __( 'Brand + Strategy', 'blkrm-portal' ),
+			'print'        => __( 'Strategic Design', 'blkrm-portal' ),
+			'digital'      => __( 'Digital', 'blkrm-portal' ),
+			'illustration' => __( 'Digital Illustration + Art', 'blkrm-portal' ),
+			'consult'      => __( 'Creative Development + Consulting', 'blkrm-portal' ),
+			'unsure'       => __( 'Not sure yet', 'blkrm-portal' ),
 		);
+	}
+
+	/**
+	 * One-line description of each type (request form).
+	 *
+	 * @return array<string, string>
+	 */
+	public static function type_descriptions() {
+		return array(
+			'branding'     => __( 'Brand audit, refresh/rebrand, identity, messaging, guidelines', 'blkrm-portal' ),
+			'print'        => __( 'Graphics, print, packaging, merch, textiles, signage, mockups', 'blkrm-portal' ),
+			'digital'      => __( 'Web, UI | UX, social, digital ads', 'blkrm-portal' ),
+			'illustration' => __( 'Commissioned art (digital or physical), murals, branded illustration, iconography', 'blkrm-portal' ),
+			'consult'      => __( 'Art direction, creative/strategic workshops, campaign planning', 'blkrm-portal' ),
+			'unsure'       => __( 'We\'ll help you scope it', 'blkrm-portal' ),
+		);
+	}
+
+	/**
+	 * Parse stored types ("print,illustration") into valid keys.
+	 *
+	 * @param string|string[] $value Stored value or list.
+	 * @return string[]
+	 */
+	public static function parse_types( $value ) {
+		$list = is_array( $value ) ? $value : explode( ',', (string) $value );
+		$keys = array_values( array_intersect( array_map( 'sanitize_key', array_map( 'trim', $list ) ), array_keys( self::types() ) ) );
+		// "Not sure yet" only makes sense on its own.
+		if ( count( $keys ) > 1 ) {
+			$keys = array_values( array_diff( $keys, array( 'unsure' ) ) );
+		}
+		return $keys ? array_values( array_unique( $keys ) ) : array( 'unsure' );
+	}
+
+	/**
+	 * Human label for stored types, e.g. "Strategic Design · Digital".
+	 *
+	 * @param string $value Stored value.
+	 * @return string
+	 */
+	public static function type_labels( $value ) {
+		$names = self::types();
+		return implode( ' · ', array_map( static function ( $k ) use ( $names ) { return $names[ $k ]; }, self::parse_types( $value ) ) );
 	}
 
 	/**
@@ -97,10 +141,7 @@ final class Projects {
 		if ( ! array_key_exists( $stage, self::stages() ) ) {
 			$stage = 'discovery';
 		}
-		$type = (string) ( $data['type'] ?? '' );
-		if ( ! array_key_exists( $type, self::types() ) ) {
-			$type = 'unsure';
-		}
+		$type = implode( ',', self::parse_types( $data['types'] ?? ( $data['type'] ?? '' ) ) );
 		$fields = array(
 			'org_id'       => $org_id,
 			'name'         => $name,

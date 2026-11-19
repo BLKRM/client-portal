@@ -29,6 +29,7 @@ final class Migrator {
 		return array(
 			1 => array( __CLASS__, 'migrate_1' ),
 			2 => array( __CLASS__, 'migrate_2' ),
+			3 => array( __CLASS__, 'migrate_3' ),
 		);
 	}
 
@@ -75,5 +76,13 @@ final class Migrator {
 	 */
 	public static function migrate_2() {
 		\BLKRM\Portal\Storage\LocalPrivateAdapter::relocate_if_empty();
+	}
+
+	/**
+	 * 0.1.3: projects can have several types (wider column).
+	 */
+	public static function migrate_3() {
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( Schema::v1() );
 	}
 }

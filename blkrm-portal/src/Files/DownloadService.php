@@ -4,7 +4,7 @@
  *
  * Replaces the upstream plain REST link (which failed without a nonce and
  * pointed at publicly reachable files). Flow:
- *   1. Portal JS asks REST for a link → access check → 15-minute signed token.
+ *   1. Portal JS asks REST for a link → access check → signed token (24 h by default).
  *   2. Browser opens /portal/download/<token>/ → token + login + access are
  *      re-checked → file is decrypted chunk by chunk and streamed.
  *

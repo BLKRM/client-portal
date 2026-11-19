@@ -91,7 +91,7 @@ and rework it. Do not build directly on top of it as-is.
   - **Encryption at rest:** libsodium `secretstream`, streamed in chunks so 1 GB files never load into memory.
     This keeps files safe even if a storage path were ever exposed.
 - **Downloads.** Every download goes through a permission-checked handler and a **signed, expiring
-  link** (default 15 minutes, single user), streamed with range support for large files.
+  link** (default 24 hours, 48 available; bound to one signed-in user), streamed with range support for large files.
 - **Uploads**
   - Chunked and resumable, with a client-side SHA-256 checksum verified after assembly.
   - Type checked by file contents, against an allow-list that adds print formats (PDF/X, AI, EPS, PSD, INDD/IDML, TIFF).
@@ -224,7 +224,7 @@ Plugin: [`blkrm-portal/`](../blkrm-portal/) (see its README for install + settin
   resume in any order and downloads support byte ranges). Files get random names in a private folder, outside the
   web root when the host allows it.
 - **Uploads:** chunked + resumable with per-chunk SHA-256 and retries; type allow-list + content sniffing.
-- **Downloads:** 15-minute signed links bound to the signed-in user; Range support; attachment + nosniff.
+- **Downloads:** signed links (24 h default, 48 h option) bound to the signed-in user; Range support; attachment + nosniff.
 - **People:** client organizations with seat limits, the `blkrm_staff` role, invites, one-click access removal
   (ends that person's sessions).
 - **Shell:** standalone BLKRM app at `/portal/` (no theme/Elementor), light/dark, approved login design.

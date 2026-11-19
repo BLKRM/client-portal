@@ -18,7 +18,6 @@ defined( 'ABSPATH' ) || exit;
 
 $project = $ctx['project'];
 $stages  = Projects::stages();
-$types   = Projects::types();
 $keys    = array_keys( $stages );
 $idx     = (int) array_search( $project->stage, $keys, true );
 $org     = Orgs::get( (int) $project->org_id );
@@ -27,7 +26,7 @@ $org     = Orgs::get( (int) $project->org_id );
 
 <div class="page-head">
 	<div class="stack-sm">
-		<span class="eyebrow"><?php echo esc_html( strtoupper( ( $org ? $org->name : '' ) . ' · ' . ( $types[ $project->type ] ?? '' ) ) ); ?></span>
+		<span class="eyebrow"><?php echo esc_html( strtoupper( ( $org ? $org->name : '' ) . ' · ' . Projects::type_labels( $project->type ) ) ); ?></span>
 		<h1 class="headline"><?php echo esc_html( strtoupper( $project->name ) ); ?><span class="dot">.</span></h1>
 		<p class="meta">
 			<?php esc_html_e( 'Due', 'blkrm-portal' ); ?> <strong><?php echo esc_html( Pages::date( $project->due_date ) ); ?></strong>
@@ -57,7 +56,7 @@ $org     = Orgs::get( (int) $project->org_id );
 <section class="panel" aria-labelledby="files-title">
 	<div class="panel__head">
 		<h2 id="files-title" class="title"><?php esc_html_e( 'Files', 'blkrm-portal' ); ?><span class="dot">.</span></h2>
-		<span class="muted small"><?php echo Pages::icon( 'lock', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php esc_html_e( 'Encrypted · links expire after 15 minutes', 'blkrm-portal' ); ?></span>
+		<span class="muted small"><?php echo Pages::icon( 'lock', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> <?php echo esc_html( sprintf( /* translators: %d: hours */ __( 'Encrypted · download links last %d hours', 'blkrm-portal' ), (int) ( \BLKRM\Portal\Files\SignedUrl::default_ttl() / 3600 ) ) ); ?></span>
 	</div>
 
 	<div class="uploader" data-blkrm-uploader data-project-id="<?php echo (int) $project->id; ?>">

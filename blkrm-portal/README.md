@@ -19,7 +19,7 @@ feedback come in Phases 1–4.
 | **Projects** | The six BLKRM stages: Discovery → Scope + Brief → Design → Proofing → Production / Print → Delivered. |
 | **Uploads** | Chunked (8 MB), resumable, SHA-256-checked per chunk, any order, retries with backoff. Files up to 2 GB by default. Extension allow-list for print formats; content sniffing blocks HTML/SVG/PHP/executables. |
 | **Storage** | Every file is **encrypted at rest** (XChaCha20-Poly1305, per-file keys, chunked format allowing fast byte-range reads) and stored under a **random name** in a private folder, outside the web root when the host allows. |
-| **Downloads** | 15-minute signed links bound to the signed-in user, streamed through a permission check, with Range support for large files. |
+| **Downloads** | Signed links (24 h by default; 1 / 24 / 48 h in Settings) bound to the signed-in user, streamed through a permission check, with Range support for large files. |
 | **Versions** | Uploading again to the same file creates v2, v3… with history. |
 | **Audit log** | Uploads, downloads, deletions and membership changes, viewable in Settings. |
 | **Storage self-check** | *BLKRM Portal → Settings + Storage* checks the encryption key, storage location and limits. It also runs a test of whether the storage folder can be fetched from the web; run it on WordPress.com staging. |
@@ -60,7 +60,7 @@ site's domain is listed in that kit's settings. Until it is, the portal falls ba
 | `BLKRM_PORTAL_DELETE_DATA` | false | When `true`, uninstall deletes tables and files |
 | `blkrm_portal_max_upload_bytes` | 2 GB | Largest file |
 | `blkrm_portal_chunk_bytes` | 8 MB | Upload chunk size (auto-reduced to fit `post_max_size`) |
-| `blkrm_portal_download_ttl` | 900 s | Download link lifetime |
+| `blkrm_portal_download_ttl` | Settings (24 h) | Download link lifetime in seconds |
 | `blkrm_portal_allowed_file_types` | see `FileTypes` | Extension → MIME allow-list |
 | `blkrm_portal_storage_adapter` | local | Swap in an R2/S3 adapter later |
 | `blkrm_portal_font_css` | Adobe kit URL | Font stylesheet ('' to disable) |

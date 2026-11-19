@@ -4,7 +4,7 @@
  *
  *   GET    /blkrm/v1/projects/<id>/files       list files in a project
  *   GET    /blkrm/v1/files/<id>/versions        version history
- *   POST   /blkrm/v1/files/<id>/download-link   signed 15-minute link {version_id?}
+ *   POST   /blkrm/v1/files/<id>/download-link   signed link (24 h default) {version_id?}
  *   DELETE /blkrm/v1/files/<id>                 staff only (soft delete)
  *
  * @package BLKRM\Portal

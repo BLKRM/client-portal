@@ -19,7 +19,22 @@ defined( 'ABSPATH' ) || exit;
  */
 final class SignedUrl {
 
-	const DEFAULT_TTL = 900; // 15 minutes.
+	const OPTION_HOURS  = 'blkrm_portal_link_hours';
+	const ALLOWED_HOURS = array( 1, 24, 48 );
+
+	/**
+	 * Link lifetime in seconds: Settings value (1, 24 or 48 hours), default 24.
+	 * Links still work only for the signed-in person they were made for.
+	 *
+	 * @return int
+	 */
+	public static function default_ttl() {
+		$hours = (int) get_option( self::OPTION_HOURS, 24 );
+		if ( ! in_array( $hours, self::ALLOWED_HOURS, true ) ) {
+			$hours = 24;
+		}
+		return $hours * 3600;
+	}
 
 	/**
 	 * Create a token.
@@ -31,7 +46,7 @@ final class SignedUrl {
 	 * @return array{token:string,expires:int}
 	 */
 	public static function create( $version_id, $user_id, $ttl = null, $now = null ) {
-		$ttl     = null === $ttl ? (int) apply_filters( 'blkrm_portal_download_ttl', self::DEFAULT_TTL ) : (int) $ttl;
+		$ttl     = null === $ttl ? (int) apply_filters( 'blkrm_portal_download_ttl', self::default_ttl() ) : (int) $ttl;
 		$expires = ( null === $now ? time() : (int) $now ) + max( 1, $ttl );
 		$payload = sprintf( 'v%d.u%d.e%d', $version_id, $user_id, $expires );
 		return array(

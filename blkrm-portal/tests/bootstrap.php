@@ -92,3 +92,7 @@ spl_autoload_register(
 
 @mkdir( ABSPATH, 0777, true );
 \BLKRM\Portal\Storage\KeyProvider::ensure_key();
+
+function sanitize_key( $k ) {
+	return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $k ) );
+}

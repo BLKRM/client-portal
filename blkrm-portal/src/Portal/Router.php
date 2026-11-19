@@ -30,7 +30,7 @@ final class Router {
 
 	const OPTION_SLUG     = 'blkrm_portal_slug';
 	const OPTION_REWRITES = 'blkrm_portal_rewrites';
-	const SECTIONS        = array( 'projects', 'todos', 'requests', 'files' );
+	const SECTIONS        = array( 'projects', 'todos', 'requests', 'files', 'resources' );
 
 	/**
 	 * Portal slug.

@@ -78,8 +78,13 @@ final class Pages {
 
 			case 'todos':
 			case 'requests':
-				$ctx['title'] = 'todos' === $route ? __( 'To-dos', 'blkrm-portal' ) : __( 'Requests', 'blkrm-portal' );
-				$ctx['phase'] = 'todos' === $route ? 2 : 3;
+			case 'resources':
+				$titles       = array(
+					'todos'     => __( 'To-dos', 'blkrm-portal' ),
+					'requests'  => __( 'Requests', 'blkrm-portal' ),
+					'resources' => __( 'Resources', 'blkrm-portal' ),
+				);
+				$ctx['title'] = $titles[ $route ];
 				$template     = 'coming';
 				break;
 
@@ -126,7 +131,8 @@ final class Pages {
 			'projects' => array( 'label' => __( 'Projects', 'blkrm-portal' ), 'url' => Router::url( 'projects' ), 'icon' => 'board' ),
 			'todos'    => array( 'label' => __( 'To-dos', 'blkrm-portal' ), 'url' => Router::url( 'todos' ), 'icon' => 'check' ),
 			'requests' => array( 'label' => __( 'Requests', 'blkrm-portal' ), 'url' => Router::url( 'requests' ), 'icon' => 'plus' ),
-			'files'    => array( 'label' => __( 'Files', 'blkrm-portal' ), 'url' => Router::url( 'files' ), 'icon' => 'folder' ),
+			'files'     => array( 'label' => __( 'Files', 'blkrm-portal' ), 'url' => Router::url( 'files' ), 'icon' => 'folder' ),
+			'resources' => array( 'label' => __( 'Resources', 'blkrm-portal' ), 'url' => Router::url( 'resources' ), 'icon' => 'book' ),
 		);
 	}
 
@@ -144,6 +150,7 @@ final class Pages {
 			'check'  => '<path d="m4 12 4 4 8-9"/><path d="M14 18h7M17 12h4"/>',
 			'plus'   => '<rect x="3" y="3" width="18" height="18"/><path d="M12 8v8M8 12h8"/>',
 			'folder' => '<path d="M3 6h7l2 2h9v12H3z"/>',
+			'book'   => '<path d="M4 4h6a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h6z"/>',
 			'moon'   => '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
 			'sun'    => '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
 			'upload' => '<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',
