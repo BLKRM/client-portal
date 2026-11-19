@@ -84,7 +84,16 @@ and rework it. Do not build directly on top of it as-is.
 ## 4. File storage + security (self-hosted first)
 
 - **Storage interface.** Code talks to a `StorageAdapter` interface. `LocalPrivateAdapter` ships first;
-  `S3CompatibleAdapter` (Cloudflare R2 / S3) comes later and needs no UI changes.
+  `R2Adapter` (Cloudflare R2, S3-compatible) is built **at the start of Phase 1** and needs no UI changes.
+- **Why R2 moved up:** the staging spike showed WordPress.com keeps all writable storage inside the web
+  root and serves files there (deny rules are ignored). Encryption and random names keep local files
+  unreadable, but files should not sit on a public path long term. R2 keeps them in a private bucket:
+  - Files stay encrypted on our side before they reach R2 (same format as local), so R2 never sees plaintext.
+  - Uploads still go through the portal in 8 MB chunks, then out to R2 with multipart upload; downloads stream
+    back through the permission-checked handler.
+  - The R2 keys live in wp-config (`BLKRM_PORTAL_R2_*`), never in the database.
+  - A one-time **migrate local → R2** tool in Settings + Storage, then local storage stays as the fallback.
+  - R2 has no egress fees; at 200 GB it costs about $3/month.
 - **Local storage rules**
   - Phase 0 spike: on WordPress.com staging, find a writable directory that is **not web-served**. If one exists, store files there.
   - Regardless of the spike result, files are stored under **random, unguessable names** (no original filename or project ID in the path).
@@ -97,8 +106,7 @@ and rework it. Do not build directly on top of it as-is.
   - Type checked by file contents, against an allow-list that adds print formats (PDF/X, AI, EPS, PSD, INDD/IDML, TIFF).
   - Per-org storage quota.
 - **Audit log.** Every upload, download, view, delete and permission change is recorded.
-- **Admin storage meter.** Shows usage against the 200 GB plan, with a warning at 75% that is the trigger to
-  enable the R2/S3 adapter.
+- **Admin storage meter.** Shows usage against the 200 GB plan (or the R2 bucket), with a warning at 75%.
 - **Backups.** Large files inflate site backups. Document how files are excluded or included, and
   revisit when moving to R2.
 
@@ -156,16 +164,22 @@ REST route and portal page.
 
 ### 6.5 Requests (new project intake)
 - **Who can submit:** any client user.
-- **Workflow:** *New → Reviewing → Accepted / Declined*. Clients see the status of their requests.
-- **Accept → Create project:** pre-fills the title, type, overview, deliverables and dates, moves the attached files into
-  the project, and starts the project in **Discovery**.
+- **Workflow:** *New → Reviewing → Changes requested ↺ → Accepted / Declined*. Clients see the status and
+  every staff note on their requests.
+- **Staff feedback before deciding.** From the queue, staff choose one of three:
+  - **Accept:** can edit the brief first (project name, types, deliverables, dates) and add an optional note to the
+    client explaining what changed. Creates the project: moves the attached files in and starts it in **Discovery**.
+  - **Request changes:** a required message; status becomes *Changes requested*, and the client gets an
+    **Update my request** button that reopens the form pre-filled. Resubmitting returns it to *Reviewing*.
+  - **Decline:** a required reason, shown to the client.
+  - Every note is emailed to the requester and kept in the request's history.
 
 **Form (consolidated from 12 fields to 7 sections, 3 short steps):**
 
 | Step | Field | Replaces | Required |
 |---|---|---|---|
 | 1. The Project | **Project title** | Title | Yes |
-| | **Project type**: Branding + Strategy · Graphic + Print · Digital · Creative Development + Consulting · Not sure | Project type | Yes |
+| | **Project type** (choose one or more; see list below) | Project type | Yes |
 | | **Overview**: "What's the idea or problem, and what would you like BLKRM to do?" | Description + Project assignment | Yes |
 | 2. Goals + Deliverables | **Goal + audience**: "What should people do after seeing this?" + optional "Who is it for?" | Goal / intended outcome + Target audience | Goal yes, audience optional |
 | | **Deliverables + specs**: repeatable rows: *Deliverable · Size / format · Material · Qty* | Final deliverables + Specs + dimensions | At least 1 row |
@@ -173,11 +187,34 @@ REST route and portal page.
 | | **Budget**: range select (incl. "Not sure yet") | Budget | No |
 | | **Creative direction + files**: style notes, links, and upload of references and working files (chunked uploads) | Creative direction + Reference + Working files | No |
 
+**Project types (multi-select; "Not sure yet" only on its own):**
+
+| Type | Covers |
+|---|---|
+| Brand + Strategy | Brand audit, refresh / rebrand, identity, messaging, guidelines |
+| Strategic Design | Graphics, print, packaging, merch, textiles, signage, mockups |
+| Digital | Web, UI \| UX, social, digital ads |
+| Digital Illustration + Art | Commissioned art (digital or physical), murals, branded illustrations, iconography |
+| Creative Development + Consulting | Art direction, creative / strategic workshops, campaign planning |
+| Not sure yet | We help you scope it |
+
 ### 6.6 Files + assets
 - **Organization:** project folders and an org-level **Brand Library** (logos, guidelines, fonts).
 - **Versions:** v1, v2… under one file, with full history and restore.
 - **Previews:** images, PDF and video; thumbnails generated for print PDFs/TIFFs where possible.
 - **Uploads:** chunked and resumable with a progress UI; drag-and-drop folders.
+
+### 6.6a Resources (nav item under Files)
+- **Two shelves:**
+  - **Picked for you:** resources shared with one client only (their brand guidelines, workshop recordings,
+    checklists).
+  - **Free for every client:** BLKRM value-add library (free trainings, recorded workshops, self-guided
+    brand-audit worksheets, templates, guides).
+- **Kinds + filter:** Training · Workshop · Worksheet · Template · Guide; a "New" badge for 14 days.
+- **Formats:** an uploaded file (stored and served like any portal file), a video (uploaded or an embed link),
+  or an external link.
+- **Staff:** add / edit, set the audience (*All clients* or one client) and publish / unpublish.
+- Opening or downloading a resource is recorded, so BLKRM can see what clients use.
 
 ### 6.7 Feedback, revisions + approvals
 - **Pinned comments** on a point of an image or PDF page; threaded, resolvable.
@@ -202,13 +239,13 @@ REST route and portal page.
 
 | Phase | Scope | Outcome |
 |---|---|---|
-| **Mockup** ✅ approved | Clickable mockup of Login, Home (calendar + date box), Projects (Board/Grid), Project detail (Timeline), To-dos, Requests form, Files; light/dark | User edits and approves the look and flow before feature code |
+| **Mockup** ✅ approved | Clickable mockup of Login, Home (calendar + date box), Projects (Board/Grid), Project detail (Timeline), To-dos, Requests form, Files, Resources; light/dark | User edits and approves the look and flow before feature code |
 | **0. Foundation** ✅ built | Fork; fix downloads; storage adapter + encryption + chunked uploads; staff role; orgs + multi-user; schema migrations; app shell + BLKRM theme + light/dark; WP.com staging spike | Secure base on WordPress.com |
-| **1. Projects** | Board/Grid toggle, 6-stage pipeline, project detail, milestones, Timeline | Day-to-day project tracking |
+| **1. R2 + Projects** | **First: R2 storage adapter + local → R2 migration.** Then Board/Grid toggle, 6-stage pipeline, project detail, milestones, Timeline | Day-to-day project tracking |
 | **2. Home + To-dos** | Dashboard, calendar + date box, to-dos with visibility toggle, activity feed | At-a-glance view for both sides |
-| **3. Requests** | 3-step intake form, request queue, accept → project | Clients start projects themselves |
+| **3. Requests + Resources** | 3-step intake form (multi-type), request queue with accept-with-edits / request changes / decline, accept → project; Resources library | Clients start projects themselves and get value between projects |
 | **4. Files + Feedback** | Folders, Brand Library, versions, previews, pinned comments, revision rounds, approval history, Scope + Brief gate | Full asset + revision workflow |
-| **5. Hardening + Polish** | Lockout, 2FA, audit viewer, notifications, Elementor widget, R2 adapter (when needed) | Production-ready |
+| **5. Hardening + Polish** | 2FA, audit viewer, notifications, Elementor widget | Production-ready |
 
 Each phase ships to WordPress.com staging for review before production.
 
@@ -237,9 +274,11 @@ Plugin: [`blkrm-portal/`](../blkrm-portal/) (see its README for install + settin
 
 - [x] Approve the mockup (layout, branding, light/dark treatment).
       Mockup v1 (private canvas): https://claude.ai/artifact/E7WuRPK1n29XEkKPgSHvS5
-- [ ] Confirm the Project type list (draft mirrors BLKRM's four service groups).
+- [x] Confirm the Project type list (multi-select; see 6.5). Shipped in plugin 0.1.3.
+- [x] Download links last 24 h by default, 48 h option (was 15 min). Shipped in plugin 0.1.3.
 - [ ] Confirm budget ranges for the request form.
-- [ ] Phase 0 spike result: is a non-web-served writable path available on WordPress.com? → install on staging, run *Settings + Storage → Run web-access test*.
+- [x] Phase 0 spike result: **no**. WordPress.com storage is inside the web root and served. → R2 moved to the start of Phase 1.
+- [ ] Create the R2 bucket + API token (Cloudflare) before Phase 1 starts.
 - [x] Client login URL: `/portal/login/{client-slug}` (keeps `/portal/projects` etc. free for app routes).
 - [ ] Add the portal domain to the Adobe Fonts kit (`agr6dga`) so Proxima Nova loads.
 - [ ] Put `BLKRM_PORTAL_ENCRYPTION_KEY` in wp-config.php on production before the first upload.
